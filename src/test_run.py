@@ -1,6 +1,7 @@
 import sys
 from substitutor import Substitutor
 from utils import load_json_pairs
+import os
 # Example text which requires NER and POS information to properly invert
 
 base_pairs = load_json_pairs('../data/cda_default_pairs.json')
@@ -9,17 +10,15 @@ name_pairs = load_json_pairs('../data/names_pairs_1000_scaled.json')
 # Initialise a substitutor with a list of pairs of gendered words (and optionally names)
 substitutor = Substitutor(base_pairs, name_pairs=name_pairs)
 
-flipped = substitutor.invert_document(text)
-
 dir_path = "../wikidata/"
 all_f_paths = [f.path for f in os.scandir(dir_path) if f.is_file()]
 for f_path in all_f_paths:
 
 	text = ""
-	with open(f_path, 'r') as file:
-		text = file.read().replace('\n', '')
+	with open(f_path, 'rb') as file:
+		text = str(file.read()).replace('\n', '')
 
-	flipped = substitutor.invert_document(text)
+	flipped = substitutor.invert_document(str(text))
 
 	f_hierarchy = f_path.split("/")
 	f_name = f_hierarchy[len(f_hierarchy) - 1]
@@ -28,7 +27,7 @@ for f_path in all_f_paths:
 	new_f_path = "../modified_wikidata/" +str(f_name) + "_modified.txt"
 
 	with open(new_f_pat, 'w') as file:
-		text = file.write(flipped)
+	    file.write(flipped)
 
 
 # It correctly doesn't flip the sentence ending noun "amber", and properly converts "her" to "his" not "him"
