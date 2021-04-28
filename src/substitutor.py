@@ -4,7 +4,7 @@ import spacy
 import sys
 
 sys.path.append('./')
-from src.utils import TwoWayDict
+from utils import TwoWayDict  # src.utils
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
@@ -13,9 +13,9 @@ class Substitutor:
 
     def __init__(self, base_pairs, name_pairs=None, his_him=True, spacy_model='en_core_web_lg'):
 
-        logging.info("Loading spaCy model...")
-        self.nlp = spacy.load(spacy_model)
-        logging.info("Done.")
+        # logging.info("Loading spaCy model...")
+        # self.nlp = spacy.load(spacy_model)
+        # logging.info("Done.")
 
         # This flag tells it whether or not to apply the special case intervention to him/his/her/hers
         self.his_him = his_him
@@ -37,23 +37,26 @@ class Substitutor:
 
     def invert_document(self, input_text):
         # Parse the doc
-        doc = self.nlp(input_text)
+        # doc = self.nlp(input_text)
 
-        output = input_text
-
-        # Walk through in reverse order making substitutions
-        for word in reversed(doc):
-
-            # Calculate inversion
-            flipped = self.invert_word(word)
-
+        for word_pos in input_text:
+            flipped = self.invert_word_neutral(word_pos)
             if flipped is not None:
-                # Splice it into output
-                start_index = word.idx
-                end_index = start_index + len(word.text)
-                output = output[:start_index] + flipped + output[end_index:]
+                word_pos[0] = flipped
 
-        return output
+        # # Walk through in reverse order making substitutions
+        # for word in reversed(doc):
+        #
+        #     # Calculate inversion
+        #     flipped = self.invert_word_neutral(word)  # invert_word(word)
+        #
+        #     if flipped is not None:
+        #         # Splice it into output
+        #         start_index = word.idx
+        #         end_index = start_index + len(word.text)
+        #         output = output[:start_index] + flipped + output[end_index:]
+
+        return word_pos
 
     def invert_word(self, spacy_word):
 
@@ -89,6 +92,47 @@ class Substitutor:
         if flipped is not None:
             # Attempt to approximate case-matching
             return self.match_case(flipped, spacy_word.text)
+        return None
+
+    def invert_word_neutral(self, word_pos):
+
+        flipped = None
+        word, pos = word_pos[0], word_pos[1]
+        text = word.text.lower()
+
+        # handle he/she case
+        if text == "he" or text == "she":
+            flipped = "they"
+
+        # Handle base case
+        elif text in self.base_pairs.keys():
+            flipped = self.base_pairs[text]
+
+        # Handle name case
+        elif text in self.name_pairs.keys():
+            flipped = self.name_pairs[text]
+
+        # Handle special case (his/his/her/hers)
+        elif self.his_him:
+            if text == "him":
+                flipped = "them"
+            elif text == "his":
+                if pos == "NNS":
+                    flipped = "theirs"
+                else:  # PRP$ (can't be PRP ??)
+                    flipped = "their"
+
+            elif text == "her":
+                if pos == "PRP$":
+                    flipped = "their"
+                else:  # PRP
+                    flipped = "them"
+            elif text == "hers":
+                flipped = "theirs"
+
+        if flipped is not None:
+            # Attempt to approximate case-matching
+            return self.match_case(flipped, word)
         return None
 
     @staticmethod
