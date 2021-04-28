@@ -14,17 +14,17 @@ flipped = substitutor.invert_document(text)
 dir_path = "../wikidata/"
 all_f_paths = [f.path for f in os.scandir(dir_path) if f.is_file()]
 for f_path in all_f_paths:
-	
-        
-        with open(f_path, 'r') as file:
-	    text = file.read().replace('\n', '')
-	
+
+	text = ""
+	with open(f_path, 'r') as file:
+		text = file.read().replace('\n', '')
+
 	flipped = substitutor.invert_document(text)
-	
+
 	f_hierarchy = f_path.split("/")
 	f_name = f_hierarchy[len(f_hierarchy) - 1]
 	no_exetension = (f_name.split("."))[0]
-	
+
 	new_f_path = "../modified_wikidata/" +str(f_name) + "_modified.txt"
 
 	with open(new_f_pat, 'w') as file:
