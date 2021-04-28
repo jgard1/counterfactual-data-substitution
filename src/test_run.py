@@ -1,6 +1,6 @@
 import sys
-from src.substitutor import Substitutor
-from src.utils import load_json_pairs
+from substitutor import Substitutor
+from utils import load_json_pairs
 # Example text which requires NER and POS information to properly invert
 
 base_pairs = load_json_pairs('../data/cda_default_pairs.json')
@@ -15,8 +15,9 @@ dir_path = "../wikidata/"
 all_f_paths = [f.path for f in os.scandir(dir_path) if f.is_file()]
 for f_path in all_f_paths:
 	
-	with open(f_path, 'r') as file:
-		text = file.read().replace('\n', '')
+        
+        with open(f_path, 'r') as file:
+	    text = file.read().replace('\n', '')
 	
 	flipped = substitutor.invert_document(text)
 	
