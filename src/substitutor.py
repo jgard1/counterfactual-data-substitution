@@ -39,10 +39,10 @@ class Substitutor:
         # Parse the doc
         # doc = self.nlp(input_text)
 
-        for word_pos in input_text:
+        for idx, word_pos in enumerate(input_text):
             flipped = self.invert_word_neutral(word_pos)
             if flipped is not None:
-                word_pos[0] = flipped
+                input_text[idx][0] = flipped
 
         # # Walk through in reverse order making substitutions
         # for word in reversed(doc):
@@ -56,7 +56,7 @@ class Substitutor:
         #         end_index = start_index + len(word.text)
         #         output = output[:start_index] + flipped + output[end_index:]
 
-        return word_pos
+        return input_text
 
     def invert_word(self, spacy_word):
 
@@ -98,7 +98,7 @@ class Substitutor:
 
         flipped = None
         word, pos = word_pos[0], word_pos[1]
-        text = word.text.lower()
+        text = word.lower()
 
         # handle he/she case
         if text == "he" or text == "she":
