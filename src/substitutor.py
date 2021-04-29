@@ -1,6 +1,8 @@
 import logging
 import random
-import spacy
+from datetime import time
+
+# import spacy
 import sys
 
 sys.path.append('./')
@@ -40,7 +42,7 @@ class Substitutor:
         # doc = self.nlp(input_text)
 
         for idx, word_pos in enumerate(input_text):
-            flipped = self.invert_word_neutral(word_pos)
+            flipped = self.invert_word(word_pos)
             if flipped is not None:
                 input_text[idx][0] = flipped
 
@@ -58,22 +60,23 @@ class Substitutor:
 
         return input_text
 
-    def invert_word(self, spacy_word):
+    def invert_word(self, word_pos):
 
         flipped = None
-        text = spacy_word.text.lower()
+
+        word, pos = word_pos[0], word_pos[1]
+        text = word.lower()
 
         # Handle base case
         if text in self.base_pairs.keys():
             flipped = self.base_pairs[text]
 
         # Handle name case
-        elif text in self.name_pairs.keys() and spacy_word.ent_type_ == "PERSON":
+        elif text in self.name_pairs.keys():
             flipped = self.name_pairs[text]
 
         # Handle special case (his/his/her/hers)
         elif self.his_him:
-            pos = spacy_word.tag_
             if text == "him":
                 flipped = "her"
             elif text == "his":
@@ -91,11 +94,11 @@ class Substitutor:
 
         if flipped is not None:
             # Attempt to approximate case-matching
-            return self.match_case(flipped, spacy_word.text)
+            return self.match_case(flipped, word)
         return None
 
     def invert_word_neutral(self, word_pos):
-
+        # invert_word_neutral_time = time.now()
         flipped = None
         word, pos = word_pos[0], word_pos[1]
         text = word.lower()
@@ -111,6 +114,47 @@ class Substitutor:
         # Handle name case
         elif text in self.name_pairs.keys():
             flipped = self.name_pairs[text]
+
+        # Handle special case (his/his/her/hers)
+        elif self.his_him:
+            if text == "him":
+                flipped = "them"
+            elif text == "his":
+                if pos == "NNS":
+                    flipped = "theirs"
+                else:  # PRP$ (can't be PRP ??)
+                    flipped = "their"
+
+            elif text == "her":
+                if pos == "PRP$":
+                    flipped = "their"
+                else:  # PRP
+                    flipped = "them"
+            elif text == "hers":
+                flipped = "theirs"
+        # print("invert_word time " + str(invert_word_neutral_time - time.now()))
+        if flipped is not None:
+            # Attempt to approximate case-matching
+            return self.match_case(flipped, word)
+        return None
+
+    def invert_word_names(self, word_pos):
+
+        flipped = None
+        word, pos = word_pos[0], word_pos[1]
+        text = word.lower()
+
+        # handle he/she case
+        if text == "he" or text == "she":
+            flipped = "they"
+
+        # Handle base case
+        elif text in self.base_pairs.keys():
+            flipped = self.base_pairs[text]
+
+        # Handle name case
+        elif text in self.name_pairs.keys():
+            flipped = "NAME-PLACEHOLDER"
 
         # Handle special case (his/his/her/hers)
         elif self.his_him:
