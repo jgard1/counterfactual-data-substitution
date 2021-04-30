@@ -4,42 +4,53 @@ from utils import load_json_pairs
 import os
 import json
 import argparse
+import random
 
-def process_text_files(input_dir, output_dir, substitutor):
-	
+
+def process_text_files(input_dir, output_dir, substitutor, invert_cond):
+
 	all_f_paths = [f.path for f in os.scandir(input_dir) if f.is_file()]
-	f = 0
+	f = 1
+
 	for f_path in all_f_paths:
-		print("Starting file: " + f_path)
-		if f % 10 == 0:
-			print("file progress: " + str((f / len(all_f_paths)) * 100) + "%")
-		text = ""
+		if f % 5 == 0:
+			print("progress: " + str((f / len(all_f_paths)) * 100) + "%")
 		with open(f_path, 'rb') as file:
 			text = str(file.read())
-
 		sentences = format_tagged_data(text)
-		# print("sentences: "+str(sentences))
-		flipped_doc = []
-		i = 1
-		for sentence in sentences:
-			if i % 10000 == 0:
-				print("progress: " + str((i / len(sentences)) * 100) + "%")
-			flipped_sentence = substitutor.invert_document(sentence)
-			# print("flipped sentence: "+str(flipped_sentence))
-			# print("\n\n\n")
-			flipped_doc.append(flipped_sentence)
-			i += 1
 
-		f_hierarchy = f_path.split("/")
-		f_name = f_hierarchy[len(f_hierarchy) - 1]
-		no_exetension = (f_name.split("."))[0]
+		#  have to perform on file level for control
+		if invert_cond == "invert_control":
+			if bool(random.getrandbits(1)):  # invert file 50% of the time
+				sentences = invert_file(sentences, substitutor)
 
-		new_f_path = output_dir +str(no_exetension) + "_modified.json"
-		print(new_f_path)
-		with open(new_f_path, 'a') as file:
-			json.dump(flipped_doc, file)
+			write_file(sentences, f_path, output_dir)
+		else:
+			sentences = invert_file(sentences, substitutor)
+			write_file(sentences, f_path, output_dir)
 		f += 1
 
+def invert_file(sentences, substitutor):
+	flipped_doc = []
+
+	for sentence in sentences:
+		flipped_sentence = substitutor.invert_document(sentence)
+		flipped_doc.append(flipped_sentence)
+	return flipped_doc
+
+
+def write_file(flipped_doc, f_path, output_dir):
+	print("Starting file: " + f_path)
+	text = ""
+
+	f_hierarchy = f_path.split("/")
+	f_name = f_hierarchy[len(f_hierarchy) - 1]
+	no_exetension = (f_name.split("."))[0]
+
+	new_f_path = output_dir +str(no_exetension) + "_modified.json"
+	print(new_f_path)
+	with open(new_f_path, 'a') as file:
+		json.dump(flipped_doc, file)
 
 
 # takes in tagged text data in the format of the wikicorpus dataset and returns the 
@@ -79,12 +90,11 @@ base_pairs = load_json_pairs('../data/cda_default_pairs.json')
 name_pairs = load_json_pairs('../data/names_pairs_1000_scaled.json')
 # Initialise a substitutor with a list of pairs of gendered words (and optionally names)
 
-substitutor = Substitutor(base_pairs, name_pairs=name_pairs)
-	# , condition = args.experiment_condition)
+substitutor = Substitutor(base_pairs, invert_cond=args.experiment_condition, name_pairs=name_pairs)
 
 
 print("starting to process text files")
-process_text_files(args.in_dir, args.out_dir, substitutor)
+process_text_files(args.in_dir, args.out_dir, substitutor, args.experiment_condition)
 print("done processing text files")
 
 

@@ -13,7 +13,7 @@ logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=lo
 
 class Substitutor:
 
-    def __init__(self, base_pairs, name_pairs=None, his_him=True, spacy_model='en_core_web_lg'):
+    def __init__(self, base_pairs, invert_cond, name_pairs=None, his_him=True):
 
         # logging.info("Loading spaCy model...")
         # self.nlp = spacy.load(spacy_model)
@@ -21,6 +21,7 @@ class Substitutor:
 
         # This flag tells it whether or not to apply the special case intervention to him/his/her/hers
         self.his_him = his_him
+        self.invert_cond = invert_cond
 
         self.base_pairs = TwoWayDict()
         for (male, female) in base_pairs:
@@ -41,10 +42,20 @@ class Substitutor:
         # Parse the doc
         # doc = self.nlp(input_text)
 
-        for idx, word_pos in enumerate(input_text):
-            flipped = self.invert_word(word_pos)
-            if flipped is not None:
-                input_text[idx][0] = flipped
+        if bool(random.getrandbits(1)) or self.invert_cond == "invert_control":
+
+            for idx, word_pos in enumerate(input_text):
+                if self.invert_cond == "invert_word":
+                    flipped = self.invert_word(word_pos)
+
+                elif self.invert_cond == "invert_word_neutral":
+                    flipped = self.invert_word_neutral(word_pos)
+
+                else:  # self.invert_cond == "invert_control"
+                    flipped = self.invert_word(word_pos)
+
+                if flipped is not None:
+                    input_text[idx][0] = flipped
 
         # # Walk through in reverse order making substitutions
         # for word in reversed(doc):
@@ -190,5 +201,5 @@ class Substitutor:
         elif target_string[0].isupper() and target_string[1:].islower():
             return input_string[0].upper() + input_string[1:].lower()
         else:
-            logging.warning("Unable to match case of {}".format(target_string))
+            # logging.warning("Unable to match case of {}".format(target_string))
             return input_string
