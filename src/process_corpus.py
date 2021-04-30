@@ -7,9 +7,11 @@ import json
 def process_text_files(input_dir, output_dir, substitutor):
 	
 	all_f_paths = [f.path for f in os.scandir(input_dir) if f.is_file()]
-	
+	f = 0
 	for f_path in all_f_paths:
-
+		print("Starting file: " + f_path)
+		if f % 10 == 0:
+			print("file progress: " + str((f / len(all_f_paths)) * 100) + "%")
 		text = ""
 		with open(f_path, 'rb') as file:
 			text = str(file.read())
@@ -17,20 +19,25 @@ def process_text_files(input_dir, output_dir, substitutor):
 		sentences = format_tagged_data(text)
 		# print("sentences: "+str(sentences))
 		flipped_doc = []
+		i = 1
 		for sentence in sentences:
+			if i % 10000 == 0:
+				print("progress: " + str((i / len(sentences)) * 100) + "%")
 			flipped_sentence = substitutor.invert_document(sentence)
 			# print("flipped sentence: "+str(flipped_sentence))
 			# print("\n\n\n")
 			flipped_doc.append(flipped_sentence)
+			i += 1
 
 		f_hierarchy = f_path.split("/")
 		f_name = f_hierarchy[len(f_hierarchy) - 1]
 		no_exetension = (f_name.split("."))[0]
 
 		new_f_path = out_dir +str(no_exetension) + "_modified.json"
-
+		print(new_f_path)
 		with open(new_f_path, 'a') as file:
 			json.dump(flipped_doc, file)
+		f += 1
 
 
 
@@ -67,14 +74,13 @@ def format_tagged_data(text):
 	sentences = text.split("\\n\\n")
 	sentences[0] = "\\n".join((sentences[0].split("\\n"))[1:])
 	ret_sentences = []
-	for sentence in sentences: 
+	for sentence in sentences:
 		# print("sentence: "+str(sentence))
 		ret_sent = []
 		phrases = sentence.split("\\n")
 		for phrase in phrases: 
 			fields = phrase.split(" ")
 			if(len(fields) == 4):
-				# print("fields: "+str(fields))
 				phrase_text = fields[0]
 				pos = fields[2]
 				for word in phrase_text.split("_"):
