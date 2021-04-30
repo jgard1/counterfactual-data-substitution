@@ -19,8 +19,8 @@ def process_text_files(input_dir, output_dir, substitutor):
 		flipped_doc = []
 		for sentence in sentences:
 			flipped_sentence = substitutor.invert_document(sentence)
-			print("flipped sentence: "+str(flipped_sentence))
-			print("\n\n\n")
+			# print("flipped sentence: "+str(flipped_sentence))
+			# print("\n\n\n")
 			flipped_doc.append(flipped_sentence)
 
 		f_hierarchy = f_path.split("/")
@@ -68,13 +68,13 @@ def format_tagged_data(text):
 	sentences[0] = "\\n".join((sentences[0].split("\\n"))[1:])
 	ret_sentences = []
 	for sentence in sentences: 
-		print("sentence: "+str(sentence))
+		# print("sentence: "+str(sentence))
 		ret_sent = []
 		phrases = sentence.split("\\n")
 		for phrase in phrases: 
 			fields = phrase.split(" ")
 			if(len(fields) == 4):
-				print("fields: "+str(fields))
+				# print("fields: "+str(fields))
 				phrase_text = fields[0]
 				pos = fields[2]
 				for word in phrase_text.split("_"):
@@ -89,6 +89,7 @@ base_pairs = load_json_pairs('../data/cda_default_pairs.json')
 name_pairs = load_json_pairs('../data/names_pairs_1000_scaled.json')
 # Initialise a substitutor with a list of pairs of gendered words (and optionally names)
 substitutor = Substitutor(base_pairs, name_pairs=name_pairs, spacy_model ="en_core_web_md")
+
 in_dir = "../tagged_wikidata/"
 out_dir = "./modified_wikicorpus/"
 
