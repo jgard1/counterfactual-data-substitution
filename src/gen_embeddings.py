@@ -3,28 +3,9 @@ import os
 import re
 import json
 import numpy as np
+import argparse
 
-dir_path = "./modified_memes/"
-model_name = "memes"
-# given a directory path, iterates through all json files in directory and loads in the words
-# to build up sentences. Basically will set stuff up for running word2vec
-# def prep_data(dir_path):
-	
-# 	all_f_paths = [f.path for f in os.scandir(dir_path) if\
-# 		(f.is_file() and re.search("json$", f.path))]
-
-# 	sentences = []
-# 	for f_path in all_f_paths:
-# 		print("f_path: "+str(f_path))
-# 		with open(f_path, 'r') as file:
-# 			document = json.load(file)
-# 		for sentence in document:
-# 			# print("sentence:"+str(sentence))
-# 			as_arr = np.asarray(sentence)
-# 			if(as_arr.size != 0):
-# 				sentences.append(as_arr[:, 0].tolist())
-# 	return sentences 
-
+# need this class in order to iterate over the sentecnes and not crash the model 
 class Sentences(object):
 
 	def __init__(self, dir_path):
@@ -34,11 +15,12 @@ class Sentences(object):
 		all_f_paths = [f.path for f in os.scandir(self.dir_path) if\
 			(f.is_file() and re.search("json$", f.path))]
 
-		sentences = []
 		for f_path in all_f_paths:
-			print("f_path: "+str(f_path))
+			# print("f_path: "+str(f_path))
 			with open(f_path, 'r') as file:
-				document = json.load(file)
+				content = file.read()
+				# print("content[63385740:63385756]"+str(content[63385740:63385756]))
+				document = json.loads(content)
 			for sentence in document:
 				# print("sentence:"+str(sentence))
 				as_arr = np.asarray(sentence)
@@ -48,26 +30,20 @@ class Sentences(object):
 					yield sent
 
 
-# get the data
-# sentences = Sentences("./modified_wikicorpus/")
-sentences = Sentences(dir_path)
 
-# train model
+
+parser = argparse.ArgumentParser()
+parser.add_argument("dir_path", help="The path to the directory containing all the sentences for trainign the model")
+parser.add_argument("model_path", help="the full path you want the model outputted to")
+args = parser.parse_args()
+
+print("generating embeddings for directory:"+str(args.dir_path))
+sentences = Sentences(args.dir_path)
 model = Word2Vec(sentences, min_count=1, vector_size = 300)
 word_vectors = model.wv
-word_vectors.save(str(model_name)+".wordvectors")
-# summarize the loaded model
-# print(model)
-# summarize vocabulary
-# words = list(model.wv.vocab)
-# print(words)
-# access vector for one word
 
+word_vectors.save(str(args.model_path)+".wordvectors")
+# model.save(str(args.model_path)+'.bin')
 
-# save model
-model.save(str(model_name)+'.bin')
-# load model
-# new_model = Word2Vec.load('dank_model.bin')
-# print(new_model)
 
 

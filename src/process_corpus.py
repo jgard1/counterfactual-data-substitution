@@ -53,7 +53,7 @@ def write_file(flipped_doc, f_path, output_dir):
 
 	new_f_path = output_dir +str(no_exetension) + "_modified.json"
 	print(new_f_path)
-	with open(new_f_path, 'a') as file:
+	with open(new_f_path, 'w') as file:
 		json.dump(flipped_doc, file)
 
 
@@ -97,7 +97,8 @@ name_pairs = load_json_pairs('../data/names_pairs_1000_scaled.json')
 substitutor = Substitutor(base_pairs, invert_cond=args.experiment_condition, name_pairs=name_pairs)
 
 
-print("starting to process text files")
+print("starting to process text files in dir:"+str(args.in_dir))
+print("\n\n\n\n\n\n")
 process_text_files(args.in_dir, args.out_dir, substitutor, args.experiment_condition)
 print("done processing text files")
 
