@@ -3,6 +3,7 @@ from substitutor import Substitutor
 from utils import load_json_pairs
 import os
 import json
+import argparse
 
 def process_text_files(input_dir, output_dir, substitutor):
 	
@@ -33,37 +34,12 @@ def process_text_files(input_dir, output_dir, substitutor):
 		f_name = f_hierarchy[len(f_hierarchy) - 1]
 		no_exetension = (f_name.split("."))[0]
 
-		new_f_path = out_dir +str(no_exetension) + "_modified.json"
+		new_f_path = output_dir +str(no_exetension) + "_modified.json"
 		print(new_f_path)
 		with open(new_f_path, 'a') as file:
 			json.dump(flipped_doc, file)
 		f += 1
 
-
-
-# # takes in tagged text data in the format of the wikicorpus dataset and returns the 
-# # data in a nice array format with punctuation reemoved. 
-# def format_tagged_data(text):
-# 	punctuation = {",", ";", ".", "?", "!", "\"", "\'", "\\", ":"}
-
-# 	lines = text.split("\n")
-# 	lines = lines[1:] # get rid of first line since it's just metadata
-# 	sent_lst = [] # list of lists that stores words and their parts of speech
-# 	for line in lines: 
-# 		sentence = []
-# 		if line != "": # this seems to be a delimeter line
-# 			print()
-# 			fields = line.split(" ")
-# 			phrase = fields[0]
-# 			pos = fields[2]
-# 			for word in phrase.split("_"):
-# 				if (word not in punctuation):
-# 					sentence.append([word, pos])
-
-# 		else: # had a blank line 
-# 			print("New sentence: "+str(sentence))
-# 			sent_lst.append(sentence)
-# 	return sent_lst
 
 
 # takes in tagged text data in the format of the wikicorpus dataset and returns the 
@@ -90,17 +66,25 @@ def format_tagged_data(text):
 	return ret_sentences
 
 
+
+parser = argparse.ArgumentParser()
+parser.add_argument("experiment_condition", help="The experiment condition(e.g. control, CDA, etc.)")
+parser.add_argument("in_dir", help="The number of permutations")
+parser.add_argument("out_dir", help="The name and location of the target .csv result file")
+
+args = parser.parse_args()
+
 # Unit testing 
 base_pairs = load_json_pairs('../data/cda_default_pairs.json')
 name_pairs = load_json_pairs('../data/names_pairs_1000_scaled.json')
 # Initialise a substitutor with a list of pairs of gendered words (and optionally names)
-substitutor = Substitutor(base_pairs, name_pairs=name_pairs, spacy_model ="en_core_web_md")
 
-in_dir = "../tagged_wikidata/"
-out_dir = "./modified_wikicorpus/"
+substitutor = Substitutor(base_pairs, name_pairs=name_pairs)
+	# , condition = args.experiment_condition)
+
 
 print("starting to process text files")
-process_text_files(in_dir, out_dir, substitutor)
+process_text_files(args.in_dir, args.out_dir, substitutor)
 print("done processing text files")
 
 
