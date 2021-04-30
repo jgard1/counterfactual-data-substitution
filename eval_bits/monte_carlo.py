@@ -4,14 +4,17 @@ import logging
 import csv
 import random
 
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("results", help="The input .csv results set")
 parser.add_argument("--permutations", help="The number of permutations", type=int, default=10000)
 parser.add_argument("output", help="The name and location of the target .csv result file")
+parser.add_argument("log_filename", help="The file logs are ritten to")
+
 args = parser.parse_args()
-print(args)
+
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO, filename=args.log_filename)
+logging.info(args)
 
 results = []
 R = args.permutations

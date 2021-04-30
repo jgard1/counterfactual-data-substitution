@@ -1,3 +1,9 @@
+####################################
+### MODIFIED BY JOSH################
+####ERROR MEMES POSSIBLE############
+####################################
+
+
 import argparse
 import csv
 import logging
@@ -21,15 +27,19 @@ def normalise(vector):
     return np.divide(vector, norm)
 
 
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("control_embedding_filename", help="The name and location of the control word embedding")
 parser.add_argument("embedding_filenames", help="The name and location of the word embeddings")
 parser.add_argument("definitional_pairs_filename", help="The name and location of pairs and locations")
 parser.add_argument("result_filename", help="The name and location of pairs and locations")
+parser.add_argument("log_filename", help="The file logs are ritten to")
 
 args = parser.parse_args()
+
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO, filename=args.log_filename)
+
 logging.info(args)
 
 logging.info("Loading control embedding")
@@ -50,11 +60,12 @@ samples = []
 
 logging.info("Calculating bias direction")
 for [a, b] in definitional_gender_pairs:
-    a = normalise(control_embedding[a])
-    b = normalise(control_embedding[b])
-    mean = np.divide(np.add(a, b), 2)
-    samples.append(np.subtract(a, mean).tolist())
-    samples.append(np.subtract(b, mean).tolist())
+    if a in control_embedding and b in control_embedding: 
+        a = normalise(control_embedding[a])
+        b = normalise(control_embedding[b])
+        mean = np.divide(np.add(a, b), 2)
+        samples.append(np.subtract(a, mean).tolist())
+        samples.append(np.subtract(b, mean).tolist())
 pca = PCA(n_components=1)
 pca.fit(samples)
 bias_direction = pca.components_[0]
@@ -65,19 +76,20 @@ control_f = control_embedding.most_similar(positive=[-bias_direction], topn=TEST
 
 # Remove words not in all embeddings
 
+# semantically this is ierating over embedding sets not individual embedddings 
 for j in range(0, len(embeddings)):
     embedding = embeddings[j]
     removed_words_m = []
     removed_words_f = []
     for word in control_m:
-        if word[0] not in embedding.vocab:
+        if word[0] not in embedding:
             removed_words_m.append(word)
             TESTING -= 1
             logging.info("Removed {} from male set".format(word[0]))
     for word in removed_words_m:
         control_m.remove(word)
     for word in control_f:
-        if word[0] not in embedding.vocab:
+        if word[0] not in embedding:
             removed_words_f.append(word)
             TESTING -= 1
             logging.info("Removed {} from female set".format(word[0]))
@@ -104,13 +116,13 @@ for j in range(0, len(embeddings)):
     logging.info("Working out data")
 
     for word in control_m:
-        if word[0] in embedding.vocab:
+        if word[0] in embedding:
             m.append((embedding[word[0]], False))
         else:
             logging.warning("{} not present in {} and not successfully removed".format(word[0], embedding_name))
 
     for word in control_f:
-        if word[0] in embedding.vocab:
+        if word[0] in embedding:
             f.append((embedding[word[0]], True))
         else:
             logging.warning("{} not present in {} and not successfully removed".format(word[0], embedding_name))
@@ -146,7 +158,7 @@ for j in range(0, len(embeddings)):
 
 results = results.transpose()
 
-logging.info("Embeddings:" + str(embedding_names))
+logging.info("\n\n\n\nEmbeddings:" + str(embedding_names))
 logging.info("Percents:" + str(percents))
 
 

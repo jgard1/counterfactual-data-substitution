@@ -5,14 +5,15 @@ import os
 
 from gensim.models import KeyedVectors
 
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-
 parser = argparse.ArgumentParser()
 parser.add_argument("embedding_filenames", help="The name and location of the word embedding")
 parser.add_argument("pairs_filename", help="The name and location of pairs and locations")
 parser.add_argument("result_filename", help="The name and location of the target result file")
+parser.add_argument("log_filename", help="The file logs are ritten to")
 
 args = parser.parse_args()
+
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO, filename=args.log_filename)
 logging.info(args)
 
 logging.info("Loading embeddings...")
@@ -27,7 +28,8 @@ lines = [['Embedding', 'Pearson-corr-coeff', '2t-P-Value', 'Spearman-rank-order-
 for i in range(0, len(embeddings)):
     embedding = embeddings[i]
     embedding_name = os.path.basename(embedding_filenames[i]).split('.')[0]
-    result = embedding.wv.evaluate_word_pairs(args.pairs_filename)
+    # print("args.pairs_filename: "+str(args.pairs_filename))
+    result = embedding.evaluate_word_pairs(args.pairs_filename)
     lines.append([embedding_name, result[0][0], result[0][1], result[1][0], result[1][1], result[2]])
 
 logging.info('Writing results to target file')

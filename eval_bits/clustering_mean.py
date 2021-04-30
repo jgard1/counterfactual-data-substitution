@@ -23,14 +23,15 @@ def normalise(vector):
     return np.divide(vector, norm)
 
 
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
-
 parser = argparse.ArgumentParser()
 parser.add_argument("control_embedding_filename", help="The name and location of the control word embedding")
 parser.add_argument("embedding_filenames", help="The name and location of the word embeddings")
 parser.add_argument("definitional_pairs_filename", help="The name and location of pairs and locations")
+parser.add_argument("log_filename", help="The file logs are ritten to")
 
 args = parser.parse_args()
+
+logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO, filename=args.log_filename)
 logging.info(args)
 
 logging.info("Loading control embedding")
@@ -50,11 +51,12 @@ samples = []
 
 logging.info("Calculating bias direction")
 for [a, b] in definitional_gender_pairs:
-    a = normalise(control_embedding[a])
-    b = normalise(control_embedding[b])
-    mean = np.divide(np.add(a, b), 2)
-    samples.append(np.subtract(a, mean).tolist())
-    samples.append(np.subtract(b, mean).tolist())
+    if a in control_embedding and b in control_embedding:
+        a = normalise(control_embedding[a])
+        b = normalise(control_embedding[b])
+        mean = np.divide(np.add(a, b), 2)
+        samples.append(np.subtract(a, mean).tolist())
+        samples.append(np.subtract(b, mean).tolist())
 pca = PCA(n_components=1)
 pca.fit(samples)
 bias_direction = pca.components_[0]
@@ -79,7 +81,7 @@ for j in range(0, len(embeddings)):
     logging.info("Working out points")
     for word in control_m:
         ground_truth.append(0)
-        if word[0] in embedding.vocab:
+        if word[0] in embedding:
             m.append(embedding[word[0]])
         else:
             # Predict similar word
@@ -87,7 +89,7 @@ for j in range(0, len(embeddings)):
 
     for word in control_f:
         ground_truth.append(1)
-        if word[0] in embedding.vocab:
+        if word[0] in embedding:
             f.append(embedding[word[0]])
         else:
             # Predict similar word
