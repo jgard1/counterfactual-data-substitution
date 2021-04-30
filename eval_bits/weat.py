@@ -9,7 +9,6 @@ import logging
 import json
 import csv
 
-logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
 class WordEmbeddingAssociationTest:
 
@@ -142,10 +141,12 @@ def main():
     parser.add_argument("embedding_filenames", help="The name and location of the word embedding")
     parser.add_argument("sections_filename", help="The name and location of the data json file")
     parser.add_argument("result_filename", help="The name and location of the target result file")
-
+    parser.add_argument("log_filename", help="The file logs are ritten to")
     parser.add_argument("--max", help="The max number of p-value tests", default=100000)
 
     args = parser.parse_args()
+
+    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO, filename=args.log_filename)
     logging.info(args)
 
     MAX = int(args.max)
@@ -188,8 +189,12 @@ def main():
             weat = WordEmbeddingAssociationTest(embedding)
 
             logging.info("Processing results for " + result.get('section'))
-
+            logging.info(len(result.get('target_x')))
+            logging.info(len(result.get('target_y')))
+            logging.info(result.get('target_x'))
+            logging.info(result.get('target_y'))
             assert (len(result.get('target_x')) == len(result.get('target_y')))
+
             assert (len(result.get('attribute_a')) == len(result.get('attribute_b')))
 
             logging.info('Calculating effect-size')
