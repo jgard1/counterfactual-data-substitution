@@ -19,16 +19,20 @@ def process_text_files(input_dir, output_dir, substitutor, invert_cond):
 			text = str(file.read())
 		sentences = format_tagged_data(text)
 
-		#  have to perform on file level for control
+		# have to perform on file level for control group
 		if invert_cond == "invert_control":
 			if bool(random.getrandbits(1)):  # invert file 50% of the time
+				print("invert sentences")
 				sentences = invert_file(sentences, substitutor)
+			else:
+				print("don't invert sentences")
 
 			write_file(sentences, f_path, output_dir)
 		else:
 			sentences = invert_file(sentences, substitutor)
 			write_file(sentences, f_path, output_dir)
 		f += 1
+
 
 def invert_file(sentences, substitutor):
 	flipped_doc = []

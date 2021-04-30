@@ -1,7 +1,6 @@
 import logging
 import random
 from datetime import time
-
 # import spacy
 import sys
 
@@ -42,11 +41,15 @@ class Substitutor:
         # Parse the doc
         # doc = self.nlp(input_text)
 
+        flipped = None
+
+        # invert sentences 100% of the time if control group (its 50% at the document level)
+        # otherwise, invert sentences 50% of the time
         if bool(random.getrandbits(1)) or self.invert_cond == "invert_control":
 
             for idx, word_pos in enumerate(input_text):
-                if self.invert_cond == "invert_word":
-                    flipped = self.invert_word(word_pos)
+                if self.invert_cond == "invert_word_names":
+                    flipped = self.invert_word_names(word_pos)
 
                 elif self.invert_cond == "invert_word_neutral":
                     flipped = self.invert_word_neutral(word_pos)
