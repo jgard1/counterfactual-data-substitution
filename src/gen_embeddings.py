@@ -4,6 +4,8 @@ import re
 import json
 import numpy as np
 
+dir_path = "./modified_memes/"
+model_name = "memes"
 # given a directory path, iterates through all json files in directory and loads in the words
 # to build up sentences. Basically will set stuff up for running word2vec
 # def prep_data(dir_path):
@@ -47,12 +49,13 @@ class Sentences(object):
 
 
 # get the data
-sentences = Sentences("./modified_wikicorpus/")
-# sentences = Sentences("./modified_memes/")
+# sentences = Sentences("./modified_wikicorpus/")
+sentences = Sentences(dir_path)
 
 # train model
 model = Word2Vec(sentences, min_count=1, vector_size = 300)
-
+word_vectors = model.wv
+word_vectors.save(str(model_name)+".wordvectors")
 # summarize the loaded model
 # print(model)
 # summarize vocabulary
@@ -62,9 +65,9 @@ model = Word2Vec(sentences, min_count=1, vector_size = 300)
 
 
 # save model
-model.save('model.bin')
+model.save(str(model_name)+'.bin')
 # load model
-new_model = Word2Vec.load('model.bin')
+# new_model = Word2Vec.load('dank_model.bin')
 # print(new_model)
 
 
