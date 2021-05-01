@@ -8,6 +8,7 @@ import argparse
 import logging
 import json
 import csv
+# import numpy.random as np.random
 
 
 class WordEmbeddingAssociationTest:
@@ -135,6 +136,12 @@ class WordEmbeddingAssociationTest:
         self.cache_similarity[args] = result
         return result
 
+# need a special function that deals with missing words in the embedding set 
+def handle_missing(embs, words, emb_size = 300):
+    for word in words:
+        if word not in embs:
+            embs.add_vectors([str(word)], [np.random.rand(emb_size)])
+    return embs 
 
 def main():
     parser = argparse.ArgumentParser()
@@ -178,12 +185,18 @@ def main():
         temp = [x.lower() for x in result.get('attribute_b')]
         result['attribute_b'] = set(temp)
 
+
         output = []
 
         for i in range(0, len(embeddings)):
 
             embedding = embeddings[i]
             embedding_name = os.path.basename(embedding_filenames[i]).split('.')[0]
+
+            embedding = handle_missing(embedding, result['target_x'])
+            embedding = handle_missing(embedding, result['target_y'])
+            embedding = handle_missing(embedding, result['attribute_a'])
+            embedding = handle_missing(embedding, result['attribute_b'])
 
             # Make a new test
             weat = WordEmbeddingAssociationTest(embedding)
@@ -206,7 +219,7 @@ def main():
             logging.info('Calculating p-value')
 
             n = len(result.get('target_x'))
-            combs = scipy.misc.comb((2*n), n)
+            combs = scipy.special.comb((2*n), n)
             if combs <= MAX:
                 # Calculate deterministically
                 p_value, s, i = weat.p_value(result.get('target_x'),
