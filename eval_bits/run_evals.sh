@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-EXP_NAME="dank"
+EXP_NAME=$1
 mkdir -p "../experiments/$EXP_NAME"
-
-EXP_EMBEDDING_FILE="../src/$EXP_NAME.wordvectors" #.wordvectors"
-CTRL_EMBEDDING_FILE="../src/memes.wordvectors"
+# "invert_word_names" "invert_word_neutral" "invert_control"
+EXP_EMBEDDING_FILES="../embeddings/$EXP_NAME.wordvectors"
+CTRL_EMBEDDING_FILE="../embeddings/invert_control.wordvectors"
 DEFINITIONAL_PAIRS="../data/cda_default_pairs.json"
 
 BIAS_CSV="../experiments/$EXP_NAME/bias.csv"
@@ -29,11 +29,11 @@ WEAT_LOG="../experiments/$EXP_NAME/weat_log.txt"
 # MIKOLOV_STATS_LOG="../experiments/$EXP_NAME/mikolov_stats_log.txt"
 
 
-python bias_classifier.py $CTRL_EMBEDDING_FILE $EXP_EMBEDDING_FILE $DEFINITIONAL_PAIRS $BIAS_CSV $BIAS_LOG
-python clustering_mean.py $CTRL_EMBEDDING_FILE $EXP_EMBEDDING_FILE $DEFINITIONAL_PAIRS $CLUSTERING_LOG
-python mikolov_analogies_test.py $EXP_EMBEDDING_FILE $MIKOLOV_ANALOGIES $MIKOLOV_CSV $MIKOLOV_LOG
-python simlex999.py $EXP_EMBEDDING_FILE $SIMLEX_PAIRS $SIMLEX_CSV $SIMLEX_LOG
+python bias_classifier.py $CTRL_EMBEDDING_FILE $EXP_EMBEDDING_FILES $DEFINITIONAL_PAIRS $BIAS_CSV $BIAS_LOG
+python clustering_mean.py $CTRL_EMBEDDING_FILE $EXP_EMBEDDING_FILES $DEFINITIONAL_PAIRS $CLUSTERING_LOG
+python mikolov_analogies_test.py $EXP_EMBEDDING_FILES $MIKOLOV_ANALOGIES $MIKOLOV_CSV $MIKOLOV_LOG
+python simlex999.py $EXP_EMBEDDING_FILES $SIMLEX_PAIRS $SIMLEX_CSV $SIMLEX_LOG
 # get statistical results on the bias output 
 # python monte_carlo.py $BIAS_CSV $BIAS_STATS $BIAS_STATS_LOG
 # python monte_carlo.py $MIKOLOV_CSV $MIKOLOV_STATS $MIKOLOV_STATS_LOG
-python weat.py $EXP_EMBEDDING_FILE $WEAT_SECTIONS $WEAT_CSV $WEAT_LOG
+python weat.py $EXP_EMBEDDING_FILES $WEAT_SECTIONS $WEAT_CSV $WEAT_LOG
