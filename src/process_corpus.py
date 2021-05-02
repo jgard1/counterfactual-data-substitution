@@ -19,6 +19,9 @@ def process_text_files(input_dir, output_dir, substitutor, invert_cond):
 			text = str(file.read())
 		sentences = format_tagged_data(text)
 
+		if invert_cond == "original_text":
+			write_file(sentences, f_path, output_dir)
+
 		# have to perform on file level for control group
 		if invert_cond == "invert_control":
 			if bool(random.getrandbits(1)):  # invert file 50% of the time
