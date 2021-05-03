@@ -4,6 +4,7 @@ import os
 import random
 
 import numpy as np
+import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
@@ -103,7 +104,7 @@ for j in range(0, len(embeddings)):
 
     tsne = TSNE(n_components=2, random_state=0)
     Y = tsne.fit_transform(a)
-
+    df_subset = pd.DataFrame()
     df_subset['tsne-2d-one'] = Y[:, 0]
     df_subset['tsne-2d-two'] = Y[:, 1]
 
