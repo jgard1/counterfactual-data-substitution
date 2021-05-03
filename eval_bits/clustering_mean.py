@@ -104,11 +104,12 @@ for j in range(0, len(embeddings)):
     tsne = TSNE(n_components=2, random_state=0)
     Y = tsne.fit_transform(a)
 
-    x_tsne = Y[:, 0]
-    y_tsne = Y[:, 1]
+    df_subset['tsne-2d-one'] = Y[:, 0]
+    df_subset['tsne-2d-two'] = Y[:, 1]
+
     plt.figure(figsize=(16, 10))
     sns.scatterplot(
-        x=x_tsne, y=y_tsne,
+        x="tsne-2d-one", y="tsne-2d-two",
         hue="y",
         palette=sns.color_palette("hls", 10),
         data=df_subset,
