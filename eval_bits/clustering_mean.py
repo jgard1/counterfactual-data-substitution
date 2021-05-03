@@ -104,8 +104,8 @@ for j in range(0, len(embeddings)):
     tsne = TSNE(n_components=2, random_state=0)
     Y = tsne.fit_transform(a)
 
-    x_tsne = tsne_results[:, 0]
-    y_tsne = tsne_results[:, 1]
+    x_tsne = Y[:, 0]
+    y_tsne = Y[:, 1]
     plt.figure(figsize=(16, 10))
     sns.scatterplot(
         x=x_tsne, y=y_tsne,
@@ -115,7 +115,7 @@ for j in range(0, len(embeddings)):
         legend="full",
         alpha=0.3
     )
-    
+
     plt.show()
 
     logging.info("Computing samples")
