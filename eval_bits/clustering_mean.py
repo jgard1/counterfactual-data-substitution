@@ -111,8 +111,8 @@ for j in range(0, len(embeddings)):
     plt.figure(figsize=(16, 10))
     sns.scatterplot(
         x="tsne-2d-one", y="tsne-2d-two",
-        hue="y",
-        palette=sns.color_palette("hls", 10),
+        # hue="y",
+        # palette=sns.color_palette("hls", 10),
         data=df_subset,
         legend="full",
         alpha=0.3
