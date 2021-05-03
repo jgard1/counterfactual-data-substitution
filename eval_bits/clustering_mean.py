@@ -115,8 +115,8 @@ for j in range(0, len(embeddings)):
         legend="full",
         alpha=0.3
     )
-
-    plt.show()
+    logging.info("saving plot")
+    plt.savefig('/home/dalelee/counterfactual-data-substitution/experiments/invert_control/invert_control_tsne.png')
 
     logging.info("Computing samples")
 
