@@ -94,7 +94,7 @@ args = parser.parse_args()
 
 # Unit testing 
 base_pairs = load_json_pairs('../data/cda_default_pairs.json')
-name_pairs = load_json_pairs('../data/names_pairs_1000_scaled.json')
+name_pairs = load_json_pairs('../data/race_pairs.json')  # CHECK BEFORE RUNNING: names_pairs_1000_scaled
 # Initialise a substitutor with a list of pairs of gendered words (and optionally names)
 
 substitutor = Substitutor(base_pairs, invert_cond=args.experiment_condition, name_pairs=name_pairs)
@@ -104,6 +104,3 @@ print("starting to process text files in dir:"+str(args.in_dir))
 print("\n\n\n\n\n\n")
 process_text_files(args.in_dir, args.out_dir, substitutor, args.experiment_condition)
 print("done processing text files")
-
-
-
