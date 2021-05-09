@@ -26,7 +26,7 @@ class Sentences(object):
 				as_arr = np.asarray(sentence)
 				if(as_arr.size != 0):
 					sent = as_arr[:, 0].tolist()
-					# print("sent:"+str(sent))
+					print("sent:"+str(sent))
 					yield sent
 
 
@@ -39,7 +39,7 @@ args = parser.parse_args()
 
 print("generating embeddings for directory:"+str(args.dir_path))
 sentences = Sentences(args.dir_path)
-model = Word2Vec(sentences, min_count=1, vector_size = 300)
+model = Word2Vec(sentences, min_count=10, workers=8, vector_size=100)
 word_vectors = model.wv
 
 word_vectors.save(str(args.model_path)+".wordvectors")
