@@ -54,7 +54,7 @@ class Substitutor:
                 elif self.invert_cond == "invert_word_neutral":
                     flipped = self.invert_word_neutral(word_pos)
 
-                else:  # self.invert_cond == "invert_control"
+                else:  # self.invert_cond == "invert_control" or "invert_race"
                     flipped = self.invert_word(word_pos)
 
                 if flipped is not None:

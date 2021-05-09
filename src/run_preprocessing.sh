@@ -11,7 +11,7 @@ ORIGINAL_DATA="$BASE$DATA_SUBDIR"
 EMBEDDINGS="embeddings/"
 mkdir -p $BASE$EMBEDDINGS
 
-for COND in "original_text"
+for COND in "invert_race"
 do
 	CORPUS_OUTDIR="$BASE$COND/"
 	mkdir -p $CORPUS_OUTDIR
