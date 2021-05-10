@@ -51,7 +51,7 @@ args = parser.parse_args()
 
 print("generating embeddings for directory:"+str(args.dir_path))
 sentences = Sentences(args.dir_path)
-model = Word2Vec(sentences, min_count=1, workers=8, vector_size=100, callbacks=monitor)
+model = Word2Vec(sentences, min_count=1, workers=8, vector_size=100, callbacks=[monitor()])
 word_vectors = model.wv
 print("saving word2vec")
 word_vectors.save(str(args.model_path)+".wordvectors")
