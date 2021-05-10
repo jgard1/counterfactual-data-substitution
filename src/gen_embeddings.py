@@ -38,7 +38,7 @@ class Sentences(object):
 				as_arr = np.asarray(sentence)
 				if(as_arr.size != 0):
 					sent = as_arr[:, 0].tolist()
-					print("sent:"+str(sent))
+					# print("sent:"+str(sent))
 					yield sent
 
 
