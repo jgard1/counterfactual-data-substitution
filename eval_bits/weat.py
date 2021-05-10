@@ -137,7 +137,7 @@ class WordEmbeddingAssociationTest:
         return result
 
 # need a special function that deals with missing words in the embedding set 
-def handle_missing(embs, words, emb_size = 300):
+def handle_missing(embs, words, emb_size = 100):
     for word in words:
         if word not in embs:
             embs.add_vectors([str(word)], [np.random.rand(emb_size)])
