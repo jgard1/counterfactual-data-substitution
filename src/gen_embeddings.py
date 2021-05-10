@@ -4,6 +4,18 @@ import re
 import json
 import numpy as np
 import argparse
+from gensim.models.callbacks import CallbackAny2Vec
+
+class monitor(CallbackAny2Vec):
+    '''Callback to print loss after each epoch.'''
+
+    def __init__(self):
+        self.epoch = 0
+
+    def on_epoch_end(self, model):
+        loss = model.get_latest_training_loss()
+        print('Loss after epoch {}: {}'.format(self.epoch, loss))
+        self.epoch += 1
 
 # need this class in order to iterate over the sentecnes and not crash the model 
 class Sentences(object):
@@ -39,10 +51,11 @@ args = parser.parse_args()
 
 print("generating embeddings for directory:"+str(args.dir_path))
 sentences = Sentences(args.dir_path)
-model = Word2Vec(sentences, min_count=1, workers=8, vector_size=100)
+model = Word2Vec(sentences, min_count=1, workers=8, vector_size=100, callbacks=monitor)
 word_vectors = model.wv
-
+print("saving word2vec")
 word_vectors.save(str(args.model_path)+".wordvectors")
+print("word2vec saved")
 # model.save(str(args.model_path)+'.bin')
 
 
